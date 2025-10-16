@@ -1,6 +1,5 @@
 package com.example.musicapp.ui.theme.views
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.example.musicapp.data.model.Album
 import com.example.musicapp.ui.theme.components.MiniPlayer
 
@@ -52,7 +51,7 @@ fun DetailScreen(
                     item { ArtistChip(alb.artist) }
                     items((1..10).toList()) { i ->
                         TrackItem(
-                            image = alb.image_url,          // <- usar image_url
+                            image = alb.imageUrl,
                             title = "${alb.title} • Track $i",
                             artist = alb.artist
                         )
@@ -74,8 +73,8 @@ private fun HeaderImage(album: Album, onBack: () -> Unit) {
             .height(320.dp)
             .clip(RoundedCornerShape(28.dp))
     ) {
-        Image(
-            painter = rememberAsyncImagePainter(album.image_url), // <- image_url
+        AsyncImage(
+            model = album.imageUrl,
             contentDescription = album.title,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -113,9 +112,14 @@ private fun HeaderImage(album: Album, onBack: () -> Unit) {
 
 @Composable private fun CircleButton(symbol: String) {
     Box(
-        modifier = Modifier.size(56.dp).clip(CircleShape).background(Color(0xFF8E5CFF)),
+        modifier = Modifier
+            .size(56.dp)
+            .clip(CircleShape)
+            .background(Color(0xFF8E5CFF)),
         contentAlignment = Alignment.Center
-    ) { Text(symbol, color = Color.White, style = MaterialTheme.typography.titleMedium) }
+    ) {
+        Text(symbol, color = Color.White, style = MaterialTheme.typography.titleMedium)
+    }
 }
 
 @Composable private fun AboutCard(album: Album) {
@@ -157,8 +161,8 @@ private fun HeaderImage(album: Album, onBack: () -> Unit) {
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = rememberAsyncImagePainter(image),
+            AsyncImage(
+                model = image,
                 contentDescription = null,
                 modifier = Modifier.size(52.dp).clip(RoundedCornerShape(10.dp)),
                 contentScale = ContentScale.Crop

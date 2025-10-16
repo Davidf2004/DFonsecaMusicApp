@@ -48,11 +48,8 @@ fun HomeScreen(
                 modifier = Modifier.padding(16.dp)
             )
             else -> {
-                LazyColumn(
-                    contentPadding = PaddingValues(bottom = 96.dp)
-                ) {
+                LazyColumn(contentPadding = PaddingValues(bottom = 96.dp)) {
                     item { Header() }
-
                     item { SectionTitle("Albums") }
                     item {
                         LazyRow(
@@ -60,21 +57,15 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(albums) { album ->
-                                AlbumCard(album) {
-                                    onAlbumClick(album.id)
-                                }
+                                AlbumCard(album) { onAlbumClick(album.id) }
                             }
                         }
                     }
-
                     item { SectionTitle("Recently Played") }
                     items(albums.take(6)) { album ->
-                        RecentItem(album) {
-                            onAlbumClick(album.id)
-                        }
+                        RecentItem(album) { onAlbumClick(album.id) }
                     }
                 }
-
                 if (albums.isNotEmpty()) {
                     MiniPlayer(album = albums.first(), modifier = Modifier.align(Alignment.BottomCenter))
                 }
@@ -141,7 +132,7 @@ private fun AlbumCard(album: Album, onClick: () -> Unit) {
     ) {
         Box {
             Image(
-                painter = rememberAsyncImagePainter(album.image_url),
+                painter = rememberAsyncImagePainter(album.imageUrl),
                 contentDescription = album.title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -184,9 +175,11 @@ private fun RecentItem(album: Album, onClick: () -> Unit) {
     ) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = rememberAsyncImagePainter(album.image_url),
+                painter = rememberAsyncImagePainter(album.imageUrl),
                 contentDescription = album.title,
-                modifier = Modifier.size(56.dp).clip(RoundedCornerShape(12.dp)),
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
             Spacer(Modifier.width(12.dp))

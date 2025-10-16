@@ -1,6 +1,5 @@
 package com.example.musicapp.ui.theme.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,7 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.example.musicapp.data.model.Album
 
 @Composable
@@ -39,8 +38,8 @@ fun MiniPlayer(album: Album?, modifier: Modifier = Modifier) {
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(album.image_url),
+            AsyncImage(
+                model = album.imageUrl,
                 contentDescription = null,
                 modifier = Modifier
                     .size(44.dp)
