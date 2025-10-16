@@ -1,6 +1,5 @@
 package com.example.musicapp.ui.theme.views
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,28 +9,26 @@ import com.example.musicapp.data.model.Album
 import com.example.musicapp.data.network.RetrofitInstance
 import kotlinx.coroutines.launch
 
-class HomeViewModel : ViewModel() {
+class DetailViewModel : ViewModel() {
 
-    var albums by mutableStateOf<List<Album>>(emptyList())
+    var album by mutableStateOf<Album?>(null)
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf<String?>(null)
 
-    init {
-        fetchAlbums()
-    }
+    fun load(id: String) {
+        if (id.isBlank()) {
+            errorMessage = "Album ID vacío"
+            return
+        }
 
-    private fun fetchAlbums() {
         viewModelScope.launch {
             isLoading = true
             errorMessage = null
             try {
-                Log.d("HomeViewModel", "Fetching albums...")
-                val response = RetrofitInstance.api.getAlbums()
-                albums = response
-                Log.d("HomeViewModel", "Albums loaded: ${response.size}")
+                val result = RetrofitInstance.api.getAlbum(id)
+                album = result
             } catch (e: Exception) {
-                Log.e("HomeViewModel", "Error fetching albums: ${e.localizedMessage}", e)
-                errorMessage = e.localizedMessage ?: "Error loading albums"
+                errorMessage = e.localizedMessage ?: "Error al cargar el álbum"
             } finally {
                 isLoading = false
             }

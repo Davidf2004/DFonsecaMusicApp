@@ -7,15 +7,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.musicapp.navigation.AppNavHost
 import com.example.musicapp.ui.theme.MusicAppTheme
-import com.example.musicapp.ui.theme.views.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            MusicApp()
-        }
+        setContent { MusicApp() }
     }
 }
 
@@ -23,7 +22,8 @@ class MainActivity : ComponentActivity() {
 fun MusicApp() {
     MusicAppTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            HomeScreen()
+            val navController = rememberNavController()
+            AppNavHost(navController)
         }
     }
 }
