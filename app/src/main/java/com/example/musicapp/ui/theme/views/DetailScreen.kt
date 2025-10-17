@@ -1,12 +1,15 @@
 package com.example.musicapp.ui.theme.views
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,21 +37,37 @@ fun DetailScreen(
     val isLoading = vm.isLoading
     val error = vm.errorMessage
 
+    var currentAlbumPlaying by remember { mutableStateOf<Album?>(null) }
+    var isPlaying by remember { mutableStateOf(false) }
+
     Box(Modifier.fillMaxSize().background(Color(0xFFF4EFFF))) {
         when {
             isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
+
             error != null -> Text(
                 "Error: $error",
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(16.dp)
             )
+
             alb != null -> {
                 LazyColumn(contentPadding = PaddingValues(bottom = 96.dp)) {
-                    item { HeaderImage(alb, onBack) }
+                    item {
+                        HeaderImage(
+                            album = alb,
+                            onBack = onBack,
+                            onPlay = {
+                                currentAlbumPlaying = alb
+                                isPlaying = true
+                            }
+                        )
+                    }
+
                     item { AboutCard(alb) }
                     item { ArtistChip(alb.artist) }
+
                     items((1..10).toList()) { i ->
                         TrackItem(
                             image = alb.imageUrl,
@@ -58,14 +77,20 @@ fun DetailScreen(
                         Spacer(Modifier.height(8.dp))
                     }
                 }
-                MiniPlayer(album = alb, modifier = Modifier.align(Alignment.BottomCenter))
+
+                MiniPlayer(
+                    album = currentAlbumPlaying ?: alb,
+                    isPlaying = isPlaying,
+                    onPlayPause = { isPlaying = !isPlaying },
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
             }
         }
     }
 }
 
 @Composable
-private fun HeaderImage(album: Album, onBack: () -> Unit) {
+private fun HeaderImage(album: Album, onBack: () -> Unit, onPlay: (Album) -> Unit) {
     Box(
         modifier = Modifier
             .padding(16.dp)
@@ -79,6 +104,7 @@ private fun HeaderImage(album: Album, onBack: () -> Unit) {
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
         Box(
             Modifier
                 .matchParentSize()
@@ -88,10 +114,16 @@ private fun HeaderImage(album: Album, onBack: () -> Unit) {
                     )
                 )
         )
+
         Box(Modifier.fillMaxSize().padding(20.dp)) {
             IconButton(onClick = onBack, modifier = Modifier.align(Alignment.TopStart)) {
                 Text("←", color = Color.White, style = MaterialTheme.typography.titleLarge)
             }
+
+            IconButton(onClick = { }, modifier = Modifier.align(Alignment.TopEnd)) {
+                Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorito", tint = Color.White)
+            }
+
             Column(Modifier.align(Alignment.BottomStart)) {
                 Text(
                     album.title,
@@ -102,31 +134,35 @@ private fun HeaderImage(album: Album, onBack: () -> Unit) {
                 Text(album.artist, color = Color(0xFFE6DFFF), style = MaterialTheme.typography.bodyMedium)
                 Spacer(Modifier.height(16.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    CircleButton("▶")
-                    CircleButton("🔀")
+                    CircleButton("▶") { onPlay(album) }
+                    CircleButton("🔀") { }
                 }
             }
         }
     }
 }
 
-@Composable private fun CircleButton(symbol: String) {
+@Composable
+private fun CircleButton(symbol: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(56.dp)
             .clip(CircleShape)
-            .background(Color(0xFF8E5CFF)),
+            .background(Color(0xFF8E5CFF))
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Text(symbol, color = Color.White, style = MaterialTheme.typography.titleMedium)
     }
 }
 
-@Composable private fun AboutCard(album: Album) {
+@Composable
+private fun AboutCard(album: Album) {
     Card(
         modifier = Modifier.padding(horizontal = 16.dp),
         shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(6.dp)
+        elevation = CardDefaults.cardElevation(6.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(Modifier.padding(16.dp)) {
             Text("About this album", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -137,7 +173,8 @@ private fun HeaderImage(album: Album, onBack: () -> Unit) {
     Spacer(Modifier.height(16.dp))
 }
 
-@Composable private fun ArtistChip(artist: String) {
+@Composable
+private fun ArtistChip(artist: String) {
     Row(Modifier.padding(horizontal = 16.dp)) {
         Surface(
             color = Color.White,
@@ -154,11 +191,13 @@ private fun HeaderImage(album: Album, onBack: () -> Unit) {
     Spacer(Modifier.height(16.dp))
 }
 
-@Composable private fun TrackItem(image: String, title: String, artist: String) {
+@Composable
+private fun TrackItem(image: String, title: String, artist: String) {
     Card(
         modifier = Modifier.padding(horizontal = 16.dp),
         shape = RoundedCornerShape(22.dp),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(

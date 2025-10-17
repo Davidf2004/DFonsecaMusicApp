@@ -1,6 +1,7 @@
 package com.example.musicapp.data.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class Album(
     val id: String,
@@ -8,4 +9,4 @@ data class Album(
     val artist: String,
     val description: String,
     @SerializedName("image") val imageUrl: String
-)
+) : Serializable
